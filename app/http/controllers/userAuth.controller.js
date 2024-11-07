@@ -20,7 +20,9 @@ const {
 class userAuthController extends Controller {
   constructor() {
     super();
-    this.code = 0;
+    // Use a fixed OTP code for testing
+    this.code = "123456"; // Assign to `this.code` for consistency with verification logic
+    // this.code = 0;
     this.phoneNumber = null;
   }
   async getOtp(req, res) {
@@ -30,8 +32,10 @@ class userAuthController extends Controller {
       throw createError.BadRequest("شماره موبایل معتبر را وارد کنید");
 
     phoneNumber = phoneNumber.trim();
-    this.phoneNumber = phoneNumber;
-    this.code = generateRandomNumber(6);
+    this.phoneNumber = phoneNumber;   
+    //// Set a fixed OTP code for testing if there is not access to KavenegarAPI.
+    //// if you have real API uncomment the below code.
+    // this.code = generateRandomNumber(6);    
 
     const result = await this.saveUser(phoneNumber);
     if (!result) throw createError.Unauthorized("ورود شما انجام نشد.");
@@ -53,7 +57,7 @@ class userAuthController extends Controller {
     if (user.otp.code != code)
       throw createError.BadRequest("کد ارسال شده صحیح نمیباشد");
 
-    if (new Date(`${user.otp.expiresIn}`).getTime() < Date.now())
+    if (new Date(user.otp.expiresIn).getTime() < Date.now())
       throw createError.BadRequest("کد اعتبار سنجی منقضی شده است");
 
     user.isVerifiedPhoneNumber = true;
@@ -104,10 +108,30 @@ class userAuthController extends Controller {
     );
     return !!updatedResult.modifiedCount;
   }
+   /// if there is not kavenegarAPI it uses fake OTP unless uses real one. 
   sendOTP(phoneNumber, res) {
+    // Check if KAVENEGAR_API_KEY exists
+    if (!process.env.KAVENEGAR_API_KEY) {
+      // Mocked response for testing
+      console.log("Mocking Kavenegar API response for testing purposes");
+  
+      return res.status(HttpStatus.OK).send({
+        statusCode: HttpStatus.OK,
+        data: {
+          message: `کد تائید برای شماره موبایل ${toPersianDigits(
+            phoneNumber
+          )} ارسال گردید (Mocked)`,
+          expiresIn: CODE_EXPIRES,
+          phoneNumber,
+        },
+      });
+    }
+  
+    // Real API call if the key is available
     const kaveNegarApi = Kavenegar.KavenegarApi({
       apikey: `${process.env.KAVENEGAR_API_KEY}`,
     });
+  
     kaveNegarApi.VerifyLookup(
       {
         receptor: phoneNumber,
@@ -128,7 +152,7 @@ class userAuthController extends Controller {
               phoneNumber,
             },
           });
-
+  
         return res.status(status).send({
           statusCode: status,
           message: "کد اعتبارسنجی ارسال نشد",
@@ -136,6 +160,7 @@ class userAuthController extends Controller {
       }
     );
   }
+  
   async completeProfile(req, res) {
     await completeProfileSchema.validateAsync(req.body);
     const { user } = req;
