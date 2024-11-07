@@ -110,11 +110,7 @@ class userAuthController extends Controller {
   }
    /// if there is not kavenegarAPI it uses fake OTP unless uses real one. 
   sendOTP(phoneNumber, res) {
-    // Check if KAVENEGAR_API_KEY exists
-    if (!process.env.KAVENEGAR_API_KEY) {
-      // Mocked response for testing
-      console.log("Mocking Kavenegar API response for testing purposes");
-  
+    /// Mocked response for testing
       return res.status(HttpStatus.OK).send({
         statusCode: HttpStatus.OK,
         data: {
@@ -125,40 +121,40 @@ class userAuthController extends Controller {
           phoneNumber,
         },
       });
-    }
+    
   
-    // Real API call if the key is available
-    const kaveNegarApi = Kavenegar.KavenegarApi({
-      apikey: `${process.env.KAVENEGAR_API_KEY}`,
-    });
+    /// Real API call if the key is available
+    // const kaveNegarApi = Kavenegar.KavenegarApi({
+    //   apikey: `${process.env.KAVENEGAR_API_KEY}`,
+    // });
   
-    kaveNegarApi.VerifyLookup(
-      {
-        receptor: phoneNumber,
-        token: this.code,
-        template: "registerVerify",
-      },
-      (response, status) => {
-        console.log(response);
-        console.log("kavenegar message status", status);
-        if (response && status === 200)
-          return res.status(HttpStatus.OK).send({
-            statusCode: HttpStatus.OK,
-            data: {
-              message: `کد تائید برای شماره موبایل ${toPersianDigits(
-                phoneNumber
-              )} ارسال گردید`,
-              expiresIn: CODE_EXPIRES,
-              phoneNumber,
-            },
-          });
+    // kaveNegarApi.VerifyLookup(
+    //   {
+    //     receptor: phoneNumber,
+    //     token: this.code,
+    //     template: "registerVerify",
+    //   },
+    //   (response, status) => {
+    //     console.log(response);
+    //     console.log("kavenegar message status", status);
+    //     if (response && status === 200)
+    //       return res.status(HttpStatus.OK).send({
+    //         statusCode: HttpStatus.OK,
+    //         data: {
+    //           message: `کد تائید برای شماره موبایل ${toPersianDigits(
+    //             phoneNumber
+    //           )} ارسال گردید`,
+    //           expiresIn: CODE_EXPIRES,
+    //           phoneNumber,
+    //         },
+    //       });
   
-        return res.status(status).send({
-          statusCode: status,
-          message: "کد اعتبارسنجی ارسال نشد",
-        });
-      }
-    );
+    //     return res.status(status).send({
+    //       statusCode: status,
+    //       message: "کد اعتبارسنجی ارسال نشد",
+    //     });
+    //   }
+    // );
   }
   
   async completeProfile(req, res) {
