@@ -116,7 +116,7 @@ class userAuthController extends Controller {
         data: {
           message: `کد تائید برای شماره موبایل ${toPersianDigits(
             phoneNumber
-          )} ارسال گردید (Mocked)`,
+          )} ارسال گردید`,
           expiresIn: CODE_EXPIRES,
           phoneNumber,
         },
