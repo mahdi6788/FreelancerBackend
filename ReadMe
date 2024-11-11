@@ -2,7 +2,7 @@ Notes:
 1. To store user information (sign up), get and post data about products and other information, should use database through API provided by backend. 
 2. we use MongoDb as a datadase. and for sending and taking APIs, we need to work with Postman
 
-<!-- 
+ 
 
 APP_DB=mongodb://0.0.0.0:27017/react-freelancer-app 
 # KAVENEGAR_API_KEY=KAVENEGAR_API_KEY
@@ -21,4 +21,3 @@ DOMAIN=localhost
 
 # do not use Kavenegar API
 
- -->
