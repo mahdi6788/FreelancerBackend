@@ -37,7 +37,8 @@ class Application {
   }
   configServer() {
     this.#app.use(
-      cors({ credentials: true, origin: process.env.ALLOW_CORS_ORIGIN })
+      ///cors({ credentials: true, origin: process.env.ALLOW_CORS_ORIGIN })
+      cors({ credentials: true, origin: "https://freelancerapp.vercel.app" })
     );
     this.#app.use(express.json());
     this.#app.use(express.urlencoded({ extended: true }));
